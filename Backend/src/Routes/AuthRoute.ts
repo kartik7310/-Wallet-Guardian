@@ -1,5 +1,6 @@
+import { Router } from "express";
 import {
-  Signup,
+  register,
   login,
   SendOtp,
   verifyOtp,
@@ -7,23 +8,16 @@ import {
   resetPassword,
   logout,
 } from "../Controllers/authController";
-
-import { Router } from "express";
+import { signupLimiter } from "../utils/rateLimiter";
+import catchAsync from "../utils/catchAsync";
 
 const router = Router();
 
-router.post("/signup", Signup);
-
-router.post("/login", login);
-
-router.post("/send-otp", SendOtp);
-
-router.post("/verify-otp", verifyOtp);
-
-router.post("/forgot-password", forgotPassword);
-
-router.post("/reset-password", resetPassword);
-
-router.get("/logout", logout);
-
+router.post("/signup", signupLimiter, catchAsync(register));
+router.post("/login", catchAsync(login));
+router.post("/send-otp", catchAsync(SendOtp));
+router.post("/verify-otp", catchAsync(verifyOtp));
+// router.post("/forgot-password", catchAsync(forgotPassword));
+// router.post("/reset-password", catchAsync(resetPassword));
+// router.get("/logout", logout); 
 export default router;

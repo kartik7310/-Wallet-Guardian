@@ -2,6 +2,7 @@
     import cors from "cors";
     import helmet from "helmet";
     import morgan from "morgan";
+    import cookieParser from "cookie-parser";
     import express from "express";
     import AuthRoute from "./Routes/AuthRoute";
     import UserRoute from "./Routes/userRoute";
@@ -13,7 +14,10 @@
     const app = express();
     dotenv.config();
     const PORT = process.env.PORT||3000;
-    app.use(cors());
+    
+   app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
+app.use(cookieParser());
     app.use(helmet());
     app.use(morgan("dev"));
 

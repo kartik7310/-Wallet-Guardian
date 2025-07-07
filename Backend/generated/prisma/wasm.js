@@ -127,9 +127,6 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   phone: 'phone',
   address: 'address',
-  token: 'token',
-  tokenExpired: 'tokenExpired',
-  isVerified: 'isVerified',
   profilePicture: 'profilePicture',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -157,6 +154,16 @@ exports.Prisma.BudgetScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.OTPScalarFieldEnum = {
+  id: 'id',
+  identifier: 'identifier',
+  token: 'token',
+  method: 'method',
+  expiresAt: 'expiresAt',
+  verified: 'verified',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -173,7 +180,6 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   password: 'password',
   phone: 'phone',
   address: 'address',
-  token: 'token',
   profilePicture: 'profilePicture'
 };
 
@@ -183,6 +189,11 @@ exports.Prisma.TransactionOrderByRelevanceFieldEnum = {
 
 exports.Prisma.BudgetOrderByRelevanceFieldEnum = {
   month: 'month'
+};
+
+exports.Prisma.OTPOrderByRelevanceFieldEnum = {
+  identifier: 'identifier',
+  token: 'token'
 };
 exports.Category = exports.$Enums.Category = {
   Food: 'Food',
@@ -199,10 +210,16 @@ exports.TransactionType = exports.$Enums.TransactionType = {
   expense: 'expense'
 };
 
+exports.OtpMethod = exports.$Enums.OtpMethod = {
+  email: 'email',
+  phone: 'phone'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Transaction: 'Transaction',
-  Budget: 'Budget'
+  Budget: 'Budget',
+  OTP: 'OTP'
 };
 
 /**

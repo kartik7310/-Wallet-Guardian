@@ -21,9 +21,6 @@ model User {
   password       String
   phone          String        @unique
   address        String
-  token          String?
-  tokenExpired   DateTime?
-  isVerified     Boolean       @default(false)
   profilePicture String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -68,4 +65,19 @@ enum Category {
   Shopping
   Investment
   Other
+}
+
+model OTP {
+  id         Int       @id @default(autoincrement())
+  identifier String // email or phone
+  token      String // 6-digit OTP
+  method     OtpMethod // "email" or "phone"
+  expiresAt  DateTime
+  verified   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+}
+
+enum OtpMethod {
+  email
+  phone
 }
