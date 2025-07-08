@@ -1,13 +1,29 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
-// 5 requests per 10 minutes per IP
+// General low-security limiter
 export const signupLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
-  message: {
-    success: false,
-    message: 'Too many signup attempts. Please try again later.',
-  },
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: "Too many sign-up attempts. Please try again later.",
 });
 
+// Strong limiter for login attempts
+export const loginLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 5,
+  message: "Too many login attempts. Try again after 5 minutes.",
+});
 
+// OTP send/verify limiter to prevent abuse
+export const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 3, // 4 OTP actions in 10 min
+  message: "Too many OTP requests. Try again later.",
+});
+
+// Forgot/reset password limiter
+export const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: "Too many password reset attempts. Try again later.",
+});

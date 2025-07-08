@@ -8,16 +8,37 @@ import {
   resetPasswordViaOtp,
   logout,
 } from "../Controllers/authController";
-import { signupLimiter } from "../utils/rateLimiter";
+
+import {
+  signupLimiter,
+  otpLimiter,
+  loginLimiter,
+  passwordResetLimiter,
+} from "../utils/rateLimiter";
+
 import catchAsync from "../utils/catchAsync";
 
 const router = Router();
 
+// Prevent mass bot signups
 router.post("/signup", signupLimiter, catchAsync(register));
-router.post("/login", catchAsync(login));
-router.post("/send-otp", catchAsync(SendOtp));
-router.post("/verify-otp", catchAsync(verifyOtp));
-router.post("/forgot-password", catchAsync(forgotPassword));
-router.post("/reset-password", catchAsync(resetPasswordViaOtp));
+
+// Prevent brute force login attacks
+router.post("/login", loginLimiter, catchAsync(login));
+
+// Avoid OTP spamming (email/SMS bomb)
+router.post("/send-otp", otpLimiter, catchAsync(SendOtp));
+
+//  Prevent OTP brute force guessing
+router.post("/verify-otp", otpLimiter, catchAsync(verifyOtp));
+
+//  Prevent forgot-password endpoint abuse
+router.post("/forgot-password", passwordResetLimiter, catchAsync(forgotPassword));
+
+//  OTP verified password reset — allow but monitor
+router.post("/reset-password", passwordResetLimiter, catchAsync(resetPasswordViaOtp));
+
+
 // router.get("/logout", logout);
+
 export default router;

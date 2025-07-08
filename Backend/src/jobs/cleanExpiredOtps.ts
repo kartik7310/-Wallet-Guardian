@@ -2,7 +2,7 @@
 import cron from 'node-cron';
 import prisma from '../config/db';
 
-cron.schedule('*/10 * * * *', async () => { 
+cron.schedule('0 6 * * *', async () => { 
   try {
       console.log("hi there how are you");
     const result = await prisma.oTP.deleteMany({
@@ -10,6 +10,7 @@ cron.schedule('*/10 * * * *', async () => {
         expiresAt: {
           lt: new Date(),
         },
+
       },
     });
 
