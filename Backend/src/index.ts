@@ -11,6 +11,9 @@
     import prisma from "./config/db";
     import logger from "./utils/logger";
     import errorHandler from "./Middleware/errorHandler";
+    // server.ts or index.ts (main entry file)
+import './jobs/cleanExpiredOtps';
+
     const app = express();
     dotenv.config();
     const PORT = process.env.PORT||3000;

@@ -57,10 +57,19 @@ export const verifyOtpSchema = z.object({
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 
 //forgot password schema
-export const forgotPasswordSchema = z.object({
+
+export const forgotPasswordRequestSchema = z.object({
   email: z.string().email("Invalid email"),
 });
-export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export const verifyForgotOtpSchema = z.object({
+  email: z.string().email("Invalid email"),
+  otp: z.string().length(6, "OTP must be 6 digits"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6),
+});
+
+export type ForgotPasswordRequestInput = z.infer<typeof forgotPasswordRequestSchema>;
+export type VerifyForgotOtpInput = z.infer<typeof verifyForgotOtpSchema>;
 
 //resetPassword schema
 export const resetPasswordSchema = z.object({

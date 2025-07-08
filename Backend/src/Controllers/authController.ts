@@ -9,13 +9,15 @@ import {
   VerifyOtpInput,
   loginSchema,
   LoginInput,
+  forgotPasswordRequestSchema,
+  verifyForgotOtpSchema,
 } from "../Schemas/auth";
-import { ExpireOtp, GenerateOtp } from "../utils/generateOtp";
+import { GenerateOtp } from "../utils/generateOtp";
 import prisma from "../config/db";
 import { decode, HashedPassword } from "../utils/hashPassword";
 
 import { generateJWTToken } from "../utils/jwt";
-import { sendVerificationEmail } from "../utils/verificationEmail";
+import { ResetPasswordSuccess, sendVerificationEmail, welcomeEmail} from "../utils/verificationEmail";
 
 async function register(req: Request, res: Response, next: NextFunction) {
   const result = registerSchema.safeParse(req.body);
@@ -41,8 +43,7 @@ async function register(req: Request, res: Response, next: NextFunction) {
         createdAt: "desc",
       },
     });
-  console.log("otp data is here",verifiedOtp);
-  
+
     if (!verifiedOtp) {
       return next(new CustomError("Please verify your OTP first", 401));
     }
@@ -63,9 +64,6 @@ async function register(req: Request, res: Response, next: NextFunction) {
         phone: data.phone,
         address: data.address,
       },
-    });
-    await prisma.oTP.delete({
-      where: { id: verifiedOtp.id },
     });
 
     return res.status(201).json({
@@ -123,6 +121,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
       sameSite: "lax",
       maxAge: 1000 * 60 * 60, // 1 hour
     });
+    await welcomeEmail(existingUser.name,existingUser.email)
     return res.status(200).json({
       success: true,
       message: "Login successful",
@@ -155,7 +154,6 @@ async function SendOtp(req: Request, res: Response, next: NextFunction) {
 });
 
 const {identifier,token} = tokenData;
-    // Add sendEmail/sendSMS function here
    await sendVerificationEmail({email:identifier,token})
     return res.status(200).json({
       success: true,
@@ -208,9 +206,80 @@ async function verifyOtp(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-function resetPassword(req: Request, res: Response) {}
+ async function forgotPassword(req: Request, res: Response, next: NextFunction) {
+  const result = forgotPasswordRequestSchema.safeParse(req.body);
+  if (!result.success) return next(new CustomError("Invalid input", 400));
+  const { email } = result.data;
 
-function forgotPassword(req: Request, res: Response) {}
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return next(new CustomError("User not found", 404));
+
+    const otp = GenerateOtp(); // 6-digit code
+   if(!otp){
+    return next(new CustomError('otp not create'))
+   }
+    await prisma.oTP.create({
+      data: {
+        identifier: email,
+        method: "email",
+        token: otp,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000), 
+      },
+    });
+
+    await sendVerificationEmail({ email, token: otp });
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent to your email for password reset",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+ async function resetPasswordViaOtp(req: Request, res: Response, next: NextFunction) {
+  const result = verifyForgotOtpSchema.safeParse(req.body);
+  if (!result.success) return next(new CustomError("Invalid input", 400));
+
+  const { email, otp, password, confirmPassword } = result.data;
+  if (password !== confirmPassword) {
+    return next(new CustomError("Password and Confirm Password must match", 400));
+  }
+
+  try {
+    const otpRecord = await prisma.oTP.findFirst({
+      where: {
+        identifier: email,
+        token: otp,
+        verified: false,
+        expiresAt: { gte: new Date() },
+      },
+    });
+
+    if (!otpRecord) {
+      return next(new CustomError("Invalid or expired OTP", 400));
+    }
+
+    const hashed = await HashedPassword(password);
+
+    const updatedUser = await prisma.user.update({
+      where: { email },
+      data: { password: hashed },
+    });
+
+    // ✅ Mark OTP as used (optional) or delete
+    await prisma.oTP.delete({ where: { id: otpRecord.id } });
+    await ResetPasswordSuccess(updatedUser?.name,updatedUser?.email)
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
 
 
 function logout(req: Request, res: Response) {
@@ -225,4 +294,4 @@ function logout(req: Request, res: Response) {
   });
 }
 
-export { register, login, SendOtp, verifyOtp, forgotPassword, resetPassword ,logout};
+export { register, login, SendOtp, verifyOtp ,logout,forgotPassword,resetPasswordViaOtp};

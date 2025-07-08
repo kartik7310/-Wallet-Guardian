@@ -5,7 +5,7 @@ import {
   SendOtp,
   verifyOtp,
   forgotPassword,
-  resetPassword,
+  resetPasswordViaOtp,
   logout,
 } from "../Controllers/authController";
 import { signupLimiter } from "../utils/rateLimiter";
@@ -17,7 +17,7 @@ router.post("/signup", signupLimiter, catchAsync(register));
 router.post("/login", catchAsync(login));
 router.post("/send-otp", catchAsync(SendOtp));
 router.post("/verify-otp", catchAsync(verifyOtp));
-// router.post("/forgot-password", catchAsync(forgotPassword));
-// router.post("/reset-password", catchAsync(resetPassword));
-// router.get("/logout", logout); 
+router.post("/forgot-password", catchAsync(forgotPassword));
+router.post("/reset-password", catchAsync(resetPasswordViaOtp));
+// router.get("/logout", logout);
 export default router;
