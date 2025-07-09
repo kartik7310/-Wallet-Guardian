@@ -147,8 +147,11 @@ exports.Prisma.TransactionScalarFieldEnum = {
 exports.Prisma.BudgetScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  category: 'category',
+  amount: 'amount',
   month: 'month',
-  limit: 'limit',
+  year: 'year',
+  notes: 'notes',
   notified: 'notified',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -188,7 +191,7 @@ exports.Prisma.TransactionOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.BudgetOrderByRelevanceFieldEnum = {
-  month: 'month'
+  notes: 'notes'
 };
 
 exports.Prisma.OTPOrderByRelevanceFieldEnum = {

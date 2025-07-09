@@ -42,15 +42,24 @@ model Transaction {
 }
 
 model Budget {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
   userId    Int
-  month     String
-  limit     Float
-  notified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  category  Category
+  amount    Float
+
+  month     Int    
+  year      Int
+  notes     String?
+  notified  Boolean   @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, category, month, year]) 
 }
+
 
 enum TransactionType {
   income
