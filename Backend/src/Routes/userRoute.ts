@@ -1,14 +1,17 @@
-  import {CreateProfile,ViewProfile,updateProfile} from "../Controllers/userController";
+import {
+  viewProfile,
+  updateProfile,
+  changePassword,
 
-  import { Router } from "express";
+} from "../Controllers/userController";
+import { Router } from "express";
 
-  const router = Router();
+import authMiddleware from "../Middleware/auth";
+import catchAsync from "../utils/catchAsync";
+const router = Router();
 
-  router.post("/add-profile", CreateProfile);
+router.get("/me", authMiddleware, catchAsync(viewProfile));
+router.put("/me", authMiddleware, catchAsync(updateProfile));
+router.patch("/me/password", authMiddleware, catchAsync(changePassword));
 
-  router.get("/view-profile", ViewProfile);
-
-  router.put("/update-profile", updateProfile);
-
-
-  export default router
+export default router;
