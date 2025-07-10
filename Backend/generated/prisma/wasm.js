@@ -150,6 +150,7 @@ exports.Prisma.BudgetScalarFieldEnum = {
   category: 'category',
   plannedAmount: 'plannedAmount',
   spentAmount: 'spentAmount',
+  lastNotifiedLevel: 'lastNotifiedLevel',
   month: 'month',
   year: 'year',
   notes: 'notes',

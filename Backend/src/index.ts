@@ -12,8 +12,10 @@
     import prisma from "./config/db";
     import logger from "./utils/logger";
     import errorHandler from "./Middleware/errorHandler";
-    // server.ts or index.ts (main entry file)
+    
+//cron jobs
 import './jobs/cleanExpiredOtps';
+import './jobs/resetBudget';
 
     const app = express();
     dotenv.config();

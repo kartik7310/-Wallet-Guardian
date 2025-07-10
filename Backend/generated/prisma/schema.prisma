@@ -46,14 +46,14 @@ model Budget {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
-  category      Category
-  plannedAmount Float
-  spentAmount   Float    @default(0)
-
-  month    Int
-  year     Int
-  notes    String?
-  notified Boolean @default(false)
+  category          Category
+  plannedAmount     Float
+  spentAmount       Float    @default(0)
+  lastNotifiedLevel Int?
+  month             Int
+  year              Int
+  notes             String?
+  notified          Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

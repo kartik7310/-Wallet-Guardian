@@ -1,10 +1,11 @@
 
 import cron from 'node-cron';
 import prisma from '../config/db';
+import logger from '../utils/logger';
 
 cron.schedule('0 6 * * *', async () => { 
   try {
-      console.log("hi there how are you");
+    logger.info("Starting cleanup of expired OTPs");
     const result = await prisma.oTP.deleteMany({
       where: {
         expiresAt: {
@@ -15,9 +16,9 @@ cron.schedule('0 6 * * *', async () => {
     });
 
     if (result.count > 0) {
-      console.log(`Cleaned ${result.count} expired OTP(s)`);
+      logger.info(`Cleaned ${result.count} expired OTP(s)`);
     }
   } catch (error: any) {
-    console.error(" Error cleaning expired OTPs:", error.message);
+    logger.error(" Error cleaning expired OTPs:", error.message);
   }
 });

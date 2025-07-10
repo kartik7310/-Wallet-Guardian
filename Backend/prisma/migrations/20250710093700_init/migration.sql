@@ -37,6 +37,7 @@ CREATE TABLE `Budget` (
     `category` ENUM('Food', 'Rent', 'Salary', 'Transport', 'Shopping', 'Investment', 'Other') NOT NULL,
     `plannedAmount` DOUBLE NOT NULL,
     `spentAmount` DOUBLE NOT NULL DEFAULT 0,
+    `lastNotifiedLevel` INTEGER NULL,
     `month` INTEGER NOT NULL,
     `year` INTEGER NOT NULL,
     `notes` VARCHAR(191) NULL,

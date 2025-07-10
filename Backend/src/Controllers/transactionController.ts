@@ -1,6 +1,7 @@
   import { Request,Response,NextFunction } from "express";
   import { transactionSchema,TransactionInput,updateTransactionSchema, transactionSearchSchema } from "../Schemas/transaction";
   import prisma from "../config/db";
+  import { notifyBudgetThreshold } from "../helper/notifyBudgetThreshold";
   import { CustomError } from "../utils/customError";
   import { buildTransactionFilter } from "../helper/searchFilter";
   import dayjs from "dayjs";
@@ -58,6 +59,23 @@ async function CreateTransaction(req: Request, res: Response, next: NextFunction
 
       // 3️, Update budget (only for expense)
       if (type === "expense") {
+        const user = await tx.user.findUnique({ where: { id: userId } });
+
+        if (user) {
+          await notifyBudgetThreshold({
+            budgetId: budget.id,
+            userEmail: user.email,
+            userName: user.name,
+            category,
+            plannedAmount: budget.plannedAmount,
+            spentAmount: budget.spentAmount, // BEFORE increment
+            txnAmount: amount,
+            month,
+            year,
+            lastLevel: budget.lastNotifiedLevel,
+            txnDate: new Date(date),
+          });
+        }
         await tx.budget.update({
           where: {
             userId_category_month_year: {
@@ -65,6 +83,7 @@ async function CreateTransaction(req: Request, res: Response, next: NextFunction
               category,
               month,
               year,
+          
             },
           },
           data: {

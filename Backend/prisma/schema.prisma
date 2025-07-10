@@ -49,12 +49,12 @@ model Budget {
   category  Category
   plannedAmount Float
   spentAmount  Float     @default(0)
-
+  lastNotifiedLevel  Int?
   month     Int    
   year      Int
   notes     String?
   notified  Boolean   @default(false)
-
+  
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
