@@ -4,9 +4,10 @@ import catchAsync from "../utils/catchAsync";
 import isAuthenticated from "../Middleware/auth"
 const router = Router();
 
-router.post("/", isAuthenticated, catchAsync(createBudget));
-router.put("/", isAuthenticated, catchAsync(updateBudget));
-router.get("/", isAuthenticated, catchAsync(GetBudget));
-router.delete("/", isAuthenticated, catchAsync(deleteBudget)); 
+router.post("/create-budget", isAuthenticated, catchAsync(createBudget));
+router.put("/update-budget", isAuthenticated, catchAsync(updateBudget));
+router.get("/get-budget", isAuthenticated, catchAsync(GetBudget));
+router.delete("/budget-delete/:budgetId", isAuthenticated, catchAsync(deleteBudget)); 
 
 export default router;
+

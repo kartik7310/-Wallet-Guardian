@@ -40,7 +40,7 @@
         const budget = await prisma.budget.create({
           data: {
             category,
-            amount,
+            plannedAmount: amount,
             month,
             year,
             notes,
@@ -98,7 +98,7 @@
             },
           },
           data: {
-            amount,
+            plannedAmount: amount,
           },
         });
 

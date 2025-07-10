@@ -6,6 +6,7 @@
     import express from "express";
     import AuthRoute from "./Routes/AuthRoute";
     import UserRoute from "./Routes/userRoute";
+    import BudgetRoute from "./Routes/budgeRoute";
     import TransactionRoute from "./Routes/transactionRoutes";
     import ReportRoute from "./Routes/reportRoutes";
     import prisma from "./config/db";
@@ -41,7 +42,9 @@ app.use(cookieParser());
     app.use("/api/v1/user", UserRoute);
 
     app.use("/api/v1/transaction", TransactionRoute);
-
+    
+    app.use("/api/v1/budget", BudgetRoute);
+    
     app.use("/api/v1/report", ReportRoute);
 
     // // api not found route

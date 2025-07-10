@@ -24,13 +24,13 @@ model User {
   profilePicture String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  transactions   Transaction[]
-  budgets        Budget[]
+  transactions   Transaction[] 
+  budgets        Budget[]     
 }
 
 model Transaction {
   id        Int             @id @default(autoincrement())
-  user      User            @relation(fields: [userId], references: [id])
+  user      User            @relation(fields: [userId], references: [id],onDelete: Cascade)
   userId    Int
   category  Category
   type      TransactionType
@@ -43,11 +43,12 @@ model Transaction {
 
 model Budget {
   id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id],onDelete: Cascade)
   userId    Int
 
   category  Category
-  amount    Float
+  plannedAmount Float
+  spentAmount  Float     @default(0)
 
   month     Int    
   year      Int
