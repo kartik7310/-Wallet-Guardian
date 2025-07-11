@@ -1,6 +1,6 @@
 export function buildTransactionFilter(userId:Number,filters:any){
   const { type, category, min, max, startDate, endDate, note } = filters;
-  const where:any = {userId};
+  const where:any = {userId, deleted: false};
   if(type)where.type = type;
     if (category) where.category = category;
 if (min || max) {

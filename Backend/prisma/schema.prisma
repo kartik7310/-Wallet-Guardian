@@ -37,6 +37,7 @@ model Transaction {
   amount    Float
   date      DateTime
   note      String?
+  deleted  Boolean        @default(false)
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
 }

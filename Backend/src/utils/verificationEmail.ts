@@ -1,4 +1,5 @@
 import { mailSender } from "../config/nodemailer";
+import { generateBankStatementHTML } from "./Tamplates/pdfFotmat";
 import { passwordResetSuccessTemplate } from "./Tamplates/ResetPasswordTemplate";
 import { verifyEmailTemplate } from "./Tamplates/verifyEmailTemplate";
 import { welcomeEmailTemplate } from "./Tamplates/WelcomeEmailTamplate";
@@ -50,6 +51,25 @@ export async function ResetPasswordSuccess(userName:string,email:string) {
     });
 
     return res;
+  } catch (error: any) {
+    throw new Error(`Failed to send verification email: ${error.message}`);
+  }
+}
+export async function sendTransactionPDFToEmail(pdfBuffer: Buffer, email: string,name:string) {
+  try {
+    await mailSender({
+      email: email,
+      title: "Your Statement",
+      body: `<p>Attached is your monthly statement, ${name}.</p>`,
+  attachments: [
+    {
+      filename: "statement.pdf",
+      content: pdfBuffer,
+      contentType: "application/pdf",
+    },
+  ],
+});
+
   } catch (error: any) {
     throw new Error(`Failed to send verification email: ${error.message}`);
   }

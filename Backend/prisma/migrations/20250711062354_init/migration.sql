@@ -24,6 +24,7 @@ CREATE TABLE `Transaction` (
     `amount` DOUBLE NOT NULL,
     `date` DATETIME(3) NOT NULL,
     `note` VARCHAR(191) NULL,
+    `deleted` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 

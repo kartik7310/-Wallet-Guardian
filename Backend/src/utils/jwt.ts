@@ -4,7 +4,8 @@ import jwt from 'jsonwebtoken';
 
 interface Payload{
   id:number,
-  email?:string
+  email?:string,
+  name?:string,
 }
 const JWT_SECRET = process.env.JWT_SECRET;
 export async function generateJWTToken(payload:Payload): Promise<string> {

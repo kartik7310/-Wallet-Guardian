@@ -2288,6 +2288,7 @@ export namespace Prisma {
     amount: number | null
     date: Date | null
     note: string | null
+    deleted: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2300,6 +2301,7 @@ export namespace Prisma {
     amount: number | null
     date: Date | null
     note: string | null
+    deleted: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2312,6 +2314,7 @@ export namespace Prisma {
     amount: number
     date: number
     note: number
+    deleted: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2338,6 +2341,7 @@ export namespace Prisma {
     amount?: true
     date?: true
     note?: true
+    deleted?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2350,6 +2354,7 @@ export namespace Prisma {
     amount?: true
     date?: true
     note?: true
+    deleted?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2362,6 +2367,7 @@ export namespace Prisma {
     amount?: true
     date?: true
     note?: true
+    deleted?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2461,6 +2467,7 @@ export namespace Prisma {
     amount: number
     date: Date
     note: string | null
+    deleted: boolean
     createdAt: Date
     updatedAt: Date
     _count: TransactionCountAggregateOutputType | null
@@ -2492,6 +2499,7 @@ export namespace Prisma {
     amount?: boolean
     date?: boolean
     note?: boolean
+    deleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -2507,11 +2515,12 @@ export namespace Prisma {
     amount?: boolean
     date?: boolean
     note?: boolean
+    deleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type TransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "type" | "amount" | "date" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["transaction"]>
+  export type TransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "type" | "amount" | "date" | "note" | "deleted" | "createdAt" | "updatedAt", ExtArgs["result"]["transaction"]>
   export type TransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -2529,6 +2538,7 @@ export namespace Prisma {
       amount: number
       date: Date
       note: string | null
+      deleted: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["transaction"]>
@@ -2908,6 +2918,7 @@ export namespace Prisma {
     readonly amount: FieldRef<"Transaction", 'Float'>
     readonly date: FieldRef<"Transaction", 'DateTime'>
     readonly note: FieldRef<"Transaction", 'String'>
+    readonly deleted: FieldRef<"Transaction", 'Boolean'>
     readonly createdAt: FieldRef<"Transaction", 'DateTime'>
     readonly updatedAt: FieldRef<"Transaction", 'DateTime'>
   }
@@ -5310,6 +5321,7 @@ export namespace Prisma {
     amount: 'amount',
     date: 'date',
     note: 'note',
+    deleted: 'deleted',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -5554,6 +5566,7 @@ export namespace Prisma {
     amount?: FloatFilter<"Transaction"> | number
     date?: DateTimeFilter<"Transaction"> | Date | string
     note?: StringNullableFilter<"Transaction"> | string | null
+    deleted?: BoolFilter<"Transaction"> | boolean
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     updatedAt?: DateTimeFilter<"Transaction"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5567,6 +5580,7 @@ export namespace Prisma {
     amount?: SortOrder
     date?: SortOrder
     note?: SortOrderInput | SortOrder
+    deleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -5584,6 +5598,7 @@ export namespace Prisma {
     amount?: FloatFilter<"Transaction"> | number
     date?: DateTimeFilter<"Transaction"> | Date | string
     note?: StringNullableFilter<"Transaction"> | string | null
+    deleted?: BoolFilter<"Transaction"> | boolean
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     updatedAt?: DateTimeFilter<"Transaction"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5597,6 +5612,7 @@ export namespace Prisma {
     amount?: SortOrder
     date?: SortOrder
     note?: SortOrderInput | SortOrder
+    deleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: TransactionCountOrderByAggregateInput
@@ -5617,6 +5633,7 @@ export namespace Prisma {
     amount?: FloatWithAggregatesFilter<"Transaction"> | number
     date?: DateTimeWithAggregatesFilter<"Transaction"> | Date | string
     note?: StringNullableWithAggregatesFilter<"Transaction"> | string | null
+    deleted?: BoolWithAggregatesFilter<"Transaction"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Transaction"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Transaction"> | Date | string
   }
@@ -5875,6 +5892,7 @@ export namespace Prisma {
     amount: number
     date: Date | string
     note?: string | null
+    deleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutTransactionsInput
@@ -5888,6 +5906,7 @@ export namespace Prisma {
     amount: number
     date: Date | string
     note?: string | null
+    deleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5898,6 +5917,7 @@ export namespace Prisma {
     amount?: FloatFieldUpdateOperationsInput | number
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutTransactionsNestedInput
@@ -5911,6 +5931,7 @@ export namespace Prisma {
     amount?: FloatFieldUpdateOperationsInput | number
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5923,6 +5944,7 @@ export namespace Prisma {
     amount: number
     date: Date | string
     note?: string | null
+    deleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5933,6 +5955,7 @@ export namespace Prisma {
     amount?: FloatFieldUpdateOperationsInput | number
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5945,6 +5968,7 @@ export namespace Prisma {
     amount?: FloatFieldUpdateOperationsInput | number
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6335,6 +6359,11 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -6354,6 +6383,7 @@ export namespace Prisma {
     amount?: SortOrder
     date?: SortOrder
     note?: SortOrder
+    deleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -6372,6 +6402,7 @@ export namespace Prisma {
     amount?: SortOrder
     date?: SortOrder
     note?: SortOrder
+    deleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -6384,6 +6415,7 @@ export namespace Prisma {
     amount?: SortOrder
     date?: SortOrder
     note?: SortOrder
+    deleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -6430,6 +6462,14 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -6439,11 +6479,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type BudgetOrderByRelevanceInput = {
@@ -6538,14 +6573,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type EnumOtpMethodFilter<$PrismaModel = never> = {
@@ -6735,6 +6762,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type UserUpdateOneRequiredWithoutTransactionsNestedInput = {
     create?: XOR<UserCreateWithoutTransactionsInput, UserUncheckedCreateWithoutTransactionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutTransactionsInput
@@ -6755,10 +6786,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type UserUpdateOneRequiredWithoutBudgetsNestedInput = {
@@ -6927,6 +6954,11 @@ export namespace Prisma {
     not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedEnumCategoryWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.Category | EnumCategoryFieldRefInput<$PrismaModel>
     in?: $Enums.Category[]
@@ -6963,9 +6995,12 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -6995,14 +7030,6 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
   export type NestedEnumOtpMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.OtpMethod | EnumOtpMethodFieldRefInput<$PrismaModel>
     in?: $Enums.OtpMethod[]
@@ -7026,6 +7053,7 @@ export namespace Prisma {
     amount: number
     date: Date | string
     note?: string | null
+    deleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7037,6 +7065,7 @@ export namespace Prisma {
     amount: number
     date: Date | string
     note?: string | null
+    deleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7115,6 +7144,7 @@ export namespace Prisma {
     amount?: FloatFilter<"Transaction"> | number
     date?: DateTimeFilter<"Transaction"> | Date | string
     note?: StringNullableFilter<"Transaction"> | string | null
+    deleted?: BoolFilter<"Transaction"> | boolean
     createdAt?: DateTimeFilter<"Transaction"> | Date | string
     updatedAt?: DateTimeFilter<"Transaction"> | Date | string
   }
@@ -7292,6 +7322,7 @@ export namespace Prisma {
     amount: number
     date: Date | string
     note?: string | null
+    deleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7316,6 +7347,7 @@ export namespace Prisma {
     amount?: FloatFieldUpdateOperationsInput | number
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7327,6 +7359,7 @@ export namespace Prisma {
     amount?: FloatFieldUpdateOperationsInput | number
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7338,6 +7371,7 @@ export namespace Prisma {
     amount?: FloatFieldUpdateOperationsInput | number
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    deleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

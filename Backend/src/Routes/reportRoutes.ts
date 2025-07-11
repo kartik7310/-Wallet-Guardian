@@ -3,14 +3,14 @@
 // • GET /api/reports/monthly-summary 
 // • GET /api/reports/export?type=pdf|csv
 
-  import  {Dashboard,MonthlyReport} from  "../Controllers/reportController";
-
+  import  {GenerateTransactionPDF} from  "../Controllers/reportController";
+   import auth from "../Middleware/auth";
   import { Router } from "express";
 
   const router = Router();
 
-  router.post("/resports/dashboard", Dashboard);
+  router.get("/transaction/statement", auth, GenerateTransactionPDF);
 
-  router.post("/resports/monthly-summary", MonthlyReport);
+  // router.post("/resports/monthly-summary", MonthlyReport);
 
   export default router

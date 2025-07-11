@@ -110,6 +110,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
     const token = await generateJWTToken({
       id: existingUser?.id,
       email: existingUser?.email,
+      name: existingUser?.name,
     });
      
     if (!token) {

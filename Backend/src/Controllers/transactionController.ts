@@ -20,7 +20,8 @@ async function CreateTransaction(req: Request, res: Response, next: NextFunction
 
   try {
     const createdTransaction = await prisma.$transaction(async (tx) => {
-      // 1️, Fetch budget
+      // 1️, Fetch budgetif()
+  
       const budget = await tx.budget.findUnique({
         where: {
           userId_category_month_year: {
@@ -108,49 +109,40 @@ async function CreateTransaction(req: Request, res: Response, next: NextFunction
   }
 }
 
-  
 async function UpdateTransaction(req: Request, res: Response, next: NextFunction) {
-  const result = updateTransactionSchema.safeParse(req.body);
-  if (!result.success) {
-    return next(new CustomError("Invalid input", 400));
-  }
+  //  Validate
+  const parse = updateTransactionSchema.safeParse(req.body);
+  if (!parse.success) return next(new CustomError("Invalid input", 400));
 
   const { transactionId } = req.params;
-  if (!transactionId) {
-    return next(new CustomError("Transaction ID not provided", 400));
-  }
+  if (!transactionId) return next(new CustomError("Transaction ID not provided", 400));
 
   const userId = req.user?.id;
-  if (!userId) {
-    return next(new CustomError("User ID not found in request", 400));
-  }
+  if (!userId) return next(new CustomError("Unauthorized", 401));
 
   try {
     const updatedTransaction = await prisma.$transaction(async (tx) => {
+      // 1️ Fetch existing transaction
       const existing = await tx.transaction.findUnique({
-        where: { id: Number(transactionId) },
+        where: { id: Number(transactionId), deleted: false },
       });
+      if (!existing) return next(new CustomError("Transaction not found", 404));
+      if (existing.userId !== userId) return next(new CustomError("Unauthorized", 403));
 
-      if (!existing) {
-        throw new CustomError("Transaction not found", 404);
-      }
+      // 2️ Resolve new values
+      const {
+        date = existing.date,
+        amount = existing.amount,
+        category = existing.category,
+        type = existing.type,
+        note = existing.note,
+      } = parse.data;
 
-      if (existing.userId !== userId) {
-        throw new CustomError("Unauthorized to update this transaction", 403);
-      }
+      // Parse month / year
+      const [oldMonth, oldYear] = [dayjs(existing.date).month() + 1, dayjs(existing.date).year()];
+      const [newMonth, newYear] = [dayjs(date).month() + 1, dayjs(date).year()];
 
-      const oldMonth = dayjs(existing.date).month() + 1;
-      const oldYear = dayjs(existing.date).year();
-
-      const newDate = result.data.date || existing.date;
-      const newMonth = dayjs(newDate).month() + 1;
-      const newYear = dayjs(newDate).year();
-
-      const newCategory = result.data.category || existing.category;
-      const newAmount = result.data.amount || existing.amount;
-      const newType = result.data.type || existing.type;
-
-      // 1️ Reverse the old budget spentAmount if it was expense
+      // 3️ Reverse OLD budget impact if old transaction was expense
       if (existing.type === "expense") {
         await tx.budget.update({
           where: {
@@ -162,55 +154,51 @@ async function UpdateTransaction(req: Request, res: Response, next: NextFunction
             },
           },
           data: {
-            spentAmount: {
-              decrement: existing.amount,
-            },
+            spentAmount: { decrement: existing.amount },
           },
         });
       }
 
-      // 2️ Apply the new transaction update
+      // 4️ Update Transaction row
       const updated = await tx.transaction.update({
-        where: { id: Number(transactionId) },
+        where: { id: existing.id },
         data: {
-          ...result.data,
-          date: result.data.date ? new Date(result.data.date) : undefined,
+          date,
+          amount,
+          category,
+          type,
+          note,
         },
       });
 
-      // 3️ Apply the new budget spentAmount if expense
-      if (newType === "expense") {
+      // 5️ Apply NEW budget impact if new type is expense
+      if (type === "expense") {
         const budget = await tx.budget.findUnique({
           where: {
             userId_category_month_year: {
               userId,
-              category: newCategory,
+              category,
               month: newMonth,
               year: newYear,
             },
           },
         });
+        if (!budget) return next(new CustomError("Budget not found for updated transaction", 404));
 
-        if (!budget) {
-          throw new CustomError("Budget not found for updated transaction details", 404);
-        }
-
-        const isOverBudget = budget.spentAmount + newAmount > budget.plannedAmount;
+        const over = budget.spentAmount + amount > budget.plannedAmount;
 
         await tx.budget.update({
           where: {
             userId_category_month_year: {
               userId,
-              category: newCategory,
+              category,
               month: newMonth,
               year: newYear,
             },
           },
           data: {
-            spentAmount: {
-              increment: newAmount,
-            },
-            notified: isOverBudget ? true : budget.notified,
+            spentAmount: { increment: amount },
+            notified: over ? true : budget.notified,
           },
         });
       }
@@ -218,13 +206,13 @@ async function UpdateTransaction(req: Request, res: Response, next: NextFunction
       return updated;
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Transaction updated successfully",
       data: updatedTransaction,
     });
-  } catch (error) {
-    next(error instanceof CustomError ? error : new CustomError("Internal Server Error", 500));
+  } catch (err) {
+   next(err);
   }
 }
 
@@ -236,13 +224,13 @@ async function DeleteTransaction(req: Request, res: Response, next: NextFunction
   if (!userId) return next(new CustomError("Unauthorized", 401));
 
   try {
-    const deletedTransaction = await prisma.$transaction(async (tx) => {
+    const updatedTransaction = await prisma.$transaction(async (tx) => {
       // 1️ Fetch transaction
       const transaction = await tx.transaction.findUnique({
-        where: { id: Number(transactionId) },
+        where: { id: Number(transactionId),deleted:false },
       });
 
-      if (!transaction) throw new CustomError("Transaction not found", 404);
+      if (!transaction || transaction.deleted) throw new CustomError("Transaction not found", 404);
       if (transaction.userId !== userId) throw new CustomError("Unauthorized", 403);
 
       const { type, amount, date, category } = transaction;
@@ -280,18 +268,17 @@ async function DeleteTransaction(req: Request, res: Response, next: NextFunction
           });
         }
       }
-
-      // 3️ Delete transaction
-      return await tx.transaction.delete({
+ // 3️ Soft delete the transaction
+      return await tx.transaction.update({
         where: { id: Number(transactionId) },
+        data: { deleted: true },
       });
     });
 
-  
     return res.status(200).json({
       success: true,
-      message: "Transaction deleted successfully",
-      data: deletedTransaction,
+      message: "Transaction deleted (soft) successfully",
+      data: updatedTransaction,
     });
   } catch (error) {
     next(error);
@@ -313,6 +300,7 @@ async function DeleteTransaction(req: Request, res: Response, next: NextFunction
 
     const transactions = await prisma.transaction.findMany({
       where: whereClause,
+      
       orderBy: {
         date: "desc",
       },
