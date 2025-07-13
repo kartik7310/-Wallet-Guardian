@@ -1,46 +1,50 @@
-
-import { generateBankStatementHTML } from "../utils/Tamplates/pdfFotmat";
- import { Request, Response, NextFunction } from "express";
-import { transactionSearchSchema } from "../Schemas/transaction";
-import { buildTransactionFilter } from "../helper/searchFilter";
-
+import { Request, Response, NextFunction } from "express";
 import prisma from "../config/db";
-import { CustomError } from "../utils/customError";
-import puppeteer from "puppeteer";
-import { sendTransactionPDFToEmail } from "../utils/verificationEmail";
+import { generateBankStatementHTML } from "../utils/Tamplates/pdfFotmat";
+import { browserPromise } from "../utils/puppeteer";
+import {CustomError} from "../utils/customError";
+import { Category } from "../../generated/prisma";
 
-
-export async function GenerateTransactionPDF(req: Request, res: Response, next: NextFunction) {
-  const {id,name,email} = req.user ! ;
-
-  if (!id ||!name ||!email) return next(new CustomError("User not authenticated", 401));
-
-  const result = transactionSearchSchema.safeParse(req.query);
-  if (!result.success) return next(new CustomError("Invalid search parameters", 400));
-
+export async function GenerateTransactionPDF(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id, name, email } = req.user!;
+  if (!id || !name || !email)
+    return next(new CustomError("User not authenticated", 401));
   try {
-    const filters = result.data;
-    const whereClause = buildTransactionFilter(id, filters);
-
     const transactions = await prisma.transaction.findMany({
-      where: whereClause,
+      where: {
+        userId: id,
+      },
       orderBy: { date: "desc" },
     });
 
-    const html = generateBankStatementHTML(transactions,{email:email,name});
- 
-    const browser = await puppeteer.launch();
+    const cleaned = transactions.map((t) => ({
+      date: t.date,
+      note: t.note ?? undefined,
+      type: t.type,
+      amount: t.amount,
+      category: t.category as Category, // Ensure category is a string
+    }));
+
+    const html = generateBankStatementHTML(cleaned, { email, name });
+
+    const browser = await browserPromise;
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 
     const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
-    await browser.close();
+    await page.close();
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=transaction-statement.pdf");
-    await sendTransactionPDFToEmail(Buffer.from(pdfBuffer), email,name);
-    res.send(pdfBuffer);
-  } catch (error) {
-    next(error);
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=transaction-statement.pdf"
+    );
+    return res.end(pdfBuffer);
+  } catch (err) {
+    return next(err);
   }
 }

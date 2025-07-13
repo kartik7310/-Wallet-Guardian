@@ -1,170 +1,121 @@
-export function generateBankStatementHTML(
-  transactions: any[],
-  user: { name: string; email: string }
-) {
-  const openingBalance = 12000;  // dummy data 
-  let runningBalance = openingBalance; // dummy data
+// utils/templates/bankStatementHtml.ts
+import dayjs from "dayjs";
 
+interface UserInfo {
+  name: string;
+  email: string;
+}
+
+interface Txn {
+  date: string | Date;
+  note?: string;
+  type: "income" | "expense";
+  amount: number;
+  category?: string;
+}
+
+export function generateBankStatementHTML(transactions: Txn[], user: UserInfo) {
   let totalIncome = 0;
   let totalExpense = 0;
 
-
   const sorted = [...transactions].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    (a, b) => +new Date(a.date) - +new Date(b.date),
   );
-  const periodStart = sorted.length > 0 ? new Date(sorted[0].date).toLocaleDateString() : "-";
-  const periodEnd = sorted.length > 0 ? new Date(sorted[sorted.length - 1].date).toLocaleDateString() : "-";
 
-  const rows = transactions.map((t) => {
-    const isIncome = t.type === "income";
-    const amount = t.amount;
-    const signedAmount = isIncome ? amount : -amount;
-    runningBalance += signedAmount;
-const dateTime = new Date(t.date).toLocaleString('en-IN', {
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: true,
-});
+  const periodStart = sorted.length
+    ? dayjs(sorted[0].date).format("DD MMM YYYY")
+    : "-";
+  const periodEnd = sorted.length
+    ? dayjs(sorted[sorted.length - 1].date).format("DD MMM YYYY")
+    : "-";
 
-    if (isIncome) totalIncome += amount;
-    else totalExpense += amount;
+  const rupees = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  });
 
-    return `
+  const rowsHtml = sorted
+ 
+  
+    .map((t) => {
+      const isIncome = t.type === "income";
+      const formattedDate = dayjs(t.date).format("DD‑MMM‑YYYY hh:mm A");
+
+      if (isIncome) totalIncome += t.amount;
+      else totalExpense += t.amount;
+
+      return `
+        <tr>
+          <td>${formattedDate}</td>
+          <td>${t.category || "-"}</td>
+          <td>${t.note || (isIncome ? "Income credited" : "Expense debited")}</td>
+          <td style="text-align:right;">${isIncome ? rupees.format(t.amount) : ""}</td>
+          <td style="text-align:right;">${!isIncome ? rupees.format(t.amount) : ""}</td>
+        </tr>`;
+    })
+    .join("");
+
+  const monthLabel = dayjs().format("MMMM YYYY");
+
+  return /*html*/ `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WalletGuardian – Statement</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+    h1, h2, h3 { margin: 0; }
+    .header, .footer { display: flex; justify-content: space-between; align-items: flex-start; }
+    .table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    .table th, .table td { border: 1px solid #ddd; padding: 8px; }
+    .table th { background: #f5f5f5; }
+    .totals td { font-weight: bold; }
+    .footer { font-size: 12px; margin-top: 40px; border-top: 1px solid #ccc; padding-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>Account Statement</h1>
+      <p><strong>ACCOUNT</strong><br>${user.name}<br>${user.email}</p>
+      <p><strong>PERIOD</strong><br>${periodStart} – ${periodEnd}</p>
+    </div>
+    <div style="text-align:right;">
+      <h2>WalletGuardian</h2>
+      <p>123 Secure Lane<br>India<br>support@walletguardian.com<br>+91 12345 67890</p>
+    </div>
+  </div>
+
+  <h3 style="text-align:center;margin-top:30px;">${monthLabel}</h3>
+
+  <table class="table">
+    <thead>
       <tr>
-    <td>${dateTime}</td>
-    <td>${t.note || '-'}</td>
-    <td>${isIncome ? `₹${amount.toFixed(2)}` : ''}</td>
-    <td>${!isIncome ? `-₹${amount.toFixed(2)}` : ''}</td>
-    <td>${signedAmount < 0 ? `-₹${Math.abs(signedAmount).toFixed(2)}` : `₹${signedAmount.toFixed(2)}`}</td>
-  </tr>
-    `;
-  }).join("");
+        <th>DATE</th>
+        <th>CATEGORY</th>
+        <th>DESCRIPTION</th>
+        <th>INCOME</th>
+        <th>EXPENSE</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr class="totals">
+        <td colspan="3">MONTHLY TOTALS</td>
+        <td style="text-align:right;">${rupees.format(totalIncome)}</td>
+        <td style="text-align:right;">${rupees.format(totalExpense)}</td>
+      </tr>
+    </tfoot>
+  </table>
 
-  const netBalance = totalIncome - totalExpense;
-  const closingBalance = openingBalance + netBalance;
-
-  return `
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          padding: 40px;
-          color: #333;
-        }
-        h1 {
-          margin-bottom: 5px;
-        }
-        h2, h3 {
-          text-align: center;
-          margin-top: 30px;
-          margin-bottom: 10px;
-        }
-        .header, .footer {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-        }
-        .company {
-          text-align: right;
-        }
-        .summary-table, .transaction-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 20px;
-          font-size: 14px;
-        }
-        .summary-table th,
-        .summary-table td,
-        .transaction-table th,
-        .transaction-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-        }
-        .summary-table th,
-        .transaction-table th {
-          background-color: #f5f5f5;
-          font-weight: bold;
-        }
-        .footer {
-          font-size: 12px;
-          margin-top: 50px;
-          border-top: 1px solid #ccc;
-          padding-top: 10px;
-        }
-        .totals {
-          font-weight: bold;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div>
-          <h1>Account Statement</h1>
-          <p><strong>ACCOUNT</strong><br>${user.name}<br>${user.email}</p>
-          <p><strong>PERIOD</strong><br>${periodStart} – ${periodEnd}</p>
-        </div>
-        <div class="company">
-          <h2>WalletGuardian</h2>
-          <p>123 Secure Lane<br>India<br>support@walletguardian.com<br>+91 12345 67890</p>
-        </div>
-      </div>
-
-      <h3>Summary</h3>
-      <table class="summary-table">
-        <thead>
-          <tr>
-            <th>PERIOD</th>
-            <th>OPENING BALANCE</th>
-            <th>CLOSING BALANCE</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</td>
-            <td>₹${openingBalance.toFixed(2)}</td>
-            <td>₹${closingBalance.toFixed(2)}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Transactions</h3>
-      <table class="transaction-table">
-        <thead>
-          <tr>
-            <th>DATE</th>
-            <th>DESCRIPTION</th>
-            <th>INCOME</th>
-            <th>EXPENSE</th>
-            <th>NET CHANGE</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-        <tfoot>
-          <tr class="totals">
-            <td colspan="2">MONTHLY TOTALS</td>
-            <td>₹${totalIncome.toFixed(2)}</td>
-            <td>-₹${totalExpense.toFixed(2)}</td>
-            <td>₹${netBalance.toFixed(2)}</td>
-          </tr>
-        </tfoot>
-      </table>
-
-      <div class="footer">
-        <div>
-          If you have found errors or have questions about your statement, please contact WalletGuardian at support@walletguardian.com or call +91 12345 67890.
-        </div>
-        <div style="text-align:right;">
-          Page 1 of 1
-        </div>
-      </div>
-    </body>
-  </html>
-  `;
+  <div class="footer">
+    <span>If you notice inaccuracies, contact support@walletguardian.com or call +91 12345 67890.</span>
+    <span style="text-align:right;">Page 1 of 1</span>
+  </div>
+</body>
+</html>
+`;
 }

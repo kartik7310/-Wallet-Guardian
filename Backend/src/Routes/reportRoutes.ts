@@ -6,11 +6,11 @@
   import  {GenerateTransactionPDF} from  "../Controllers/reportController";
    import auth from "../Middleware/auth";
   import { Router } from "express";
+import catchAsync from "../utils/catchAsync";
 
   const router = Router();
 
-  router.get("/transaction/statement", auth, GenerateTransactionPDF);
+  router.get("/transaction/statement", auth, catchAsync(GenerateTransactionPDF));
 
-  // router.post("/resports/monthly-summary", MonthlyReport);
 
   export default router

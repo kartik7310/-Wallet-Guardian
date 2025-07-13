@@ -5,49 +5,50 @@
   import { CustomError } from "../utils/customError";
   import { buildTransactionFilter } from "../helper/searchFilter";
   import dayjs from "dayjs";
+import logger from "../utils/logger";
 
-async function CreateTransaction(req: Request, res: Response, next: NextFunction) {
-  const result = transactionSchema.safeParse(req.body);
-  if (!result.success) return next(new CustomError("Invalid input", 400));
+ async function CreateTransaction(req: Request, res: Response, next: NextFunction) {
+  // 1️⃣ Validate payload
+  const parsed = transactionSchema.safeParse(req.body);
+  if (!parsed.success) return next(new CustomError("Invalid input", 400));
 
   const userId = req.user?.id;
   if (!userId) return next(new CustomError("Unauthorized", 401));
 
-  const { type, category, amount, date, note }: TransactionInput = result.data;
-
+  const { type, category, amount, date, note }: TransactionInput = parsed.data;
   const month = dayjs(date).month() + 1;
-  const year = dayjs(date).year();
+  const year  = dayjs(date).year();
 
   try {
-    const createdTransaction = await prisma.$transaction(async (tx) => {
-      // 1️, Fetch budgetif()
-  
-      const budget = await tx.budget.findUnique({
-        where: {
-          userId_category_month_year: {
-            userId,
-            category,
-            month,
-            year,
+    const transaction = await prisma.$transaction(async (tx) => {
+      let budget;                          // budget may be undefined for income
+
+      // 2️⃣ Expense‑only: fetch + validate budget
+      if (type === "expense") {
+        budget = await tx.budget.findUnique({
+          where: {
+            userId_category_month_year: {
+              userId,
+              category,
+              month,
+              year,
+            },
           },
-        },
-      });
+        });
 
-      if (!budget) {
-        return next(new CustomError("Budget not set for this category/month/year", 403));
+        if (!budget) {
+          throw new CustomError("Budget not set for this category/month/year", 403);
+        }
+
+        const overBudget = budget.spentAmount + amount > budget.plannedAmount;
+        if (overBudget) {
+          logger.info(`User ${userId} exceeded budget (${category} ${month}/${year})`);
+          throw new CustomError("You have exceeded your budget for this category", 403);
+        }
       }
 
-      const isOverBudget =
-        type === "expense" && budget.spentAmount + amount > budget.plannedAmount;
-
-      if (isOverBudget) {
-        console.warn("User exceeded the budget");
-        return next(new CustomError("You have exceeded your budget for this category", 403));
-        //  trigger notifications here (inside or outside transaction)
-      }
-
-      // 2️, Create transaction
-      const transaction = await tx.transaction.create({
+      // 3️⃣ Create transaction (income or expense)
+      const created = await tx.transaction.create({
         data: {
           type,
           category,
@@ -58,54 +59,43 @@ async function CreateTransaction(req: Request, res: Response, next: NextFunction
         },
       });
 
-      // 3️, Update budget (only for expense)
-      if (type === "expense") {
+      // 4️⃣ If expense, update budget + notify thresholds
+      if (type === "expense" && budget) {
+        // Send threshold email if needed
         const user = await tx.user.findUnique({ where: { id: userId } });
-
         if (user) {
           await notifyBudgetThreshold({
-            budgetId: budget.id,
-            userEmail: user.email,
-            userName: user.name,
+            budgetId:        budget.id,
+            userEmail:       user.email,
+            userName:        user.name,
             category,
-            plannedAmount: budget.plannedAmount,
-            spentAmount: budget.spentAmount, // BEFORE increment
-            txnAmount: amount,
+            plannedAmount:   budget.plannedAmount,
+            spentAmount:     budget.spentAmount,    // BEFORE increment
+            txnAmount:       amount,
             month,
             year,
-            lastLevel: budget.lastNotifiedLevel,
-            txnDate: new Date(date),
+            lastLevel:       budget.lastNotifiedLevel,
+            txnDate:         new Date(date),
           });
         }
+
+        // Increment spentAmount
         await tx.budget.update({
-          where: {
-            userId_category_month_year: {
-              userId,
-              category,
-              month,
-              year,
-          
-            },
-          },
-          data: {
-            spentAmount: {
-              increment: amount,
-            },
-            notified: isOverBudget ? true : budget.notified,
-          },
+          where: { id: budget.id },
+          data: { spentAmount: { increment: amount } },
         });
       }
 
-      return transaction;
+      return created;
     });
 
     return res.status(201).json({
       success: true,
       message: "Transaction created successfully",
-      data: createdTransaction,
+      data: transaction,
     });
   } catch (error) {
-    next(error);  
+    next(error instanceof CustomError ? error : new CustomError("Internal server error", 500));
   }
 }
 

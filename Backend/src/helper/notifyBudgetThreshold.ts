@@ -2,7 +2,7 @@
 import prisma from "../config/db";         
 import  {mailSender} from "../config/nodemailer" 
  import { budgetThresholdEmailTemplate } from "../utils/Tamplates/budgetThresholdEmail";
-/** ────────── Types ───────────────────────────────────────────── */
+/** ────────── Types ───────────────────────────────────────── */
 interface NotifyOptions {
   budgetId: number;        
   userEmail: string;

@@ -12,11 +12,11 @@
     import prisma from "./config/db";
     import logger from "./utils/logger";
     import errorHandler from "./Middleware/errorHandler";
-    
+    import {startTransactionStatementJob} from "./jobs/transactionStatement";
 //cron jobs
 import './jobs/cleanExpiredOtps';
 import './jobs/resetBudget';
-
+startTransactionStatementJob();
     const app = express();
     dotenv.config();
     const PORT = process.env.PORT||3000;
