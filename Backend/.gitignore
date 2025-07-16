@@ -14,3 +14,4 @@ Thumbs.db
 
 # Compiled TypeScript output (if any)
 /dist
+/generated

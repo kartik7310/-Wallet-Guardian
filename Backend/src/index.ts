@@ -49,15 +49,6 @@ app.use(cookieParser());
     
     app.use("/api/v1/report", ReportRoute);
 
-    // // api not found route
-    // app.use("*", (req, res) => {
-    //   res.status(404).json({
-    //     success: false,
-    //     message: "API endpoint not found",
-    //   });
-    // });
-
-    // Global error handler
 
     app.use(errorHandler);
 
