@@ -8,7 +8,7 @@
 import logger from "../utils/logger";
 
  async function CreateTransaction(req: Request, res: Response, next: NextFunction) {
-  // 1️⃣ Validate payload
+  // 1️ Validate payload
   const parsed = transactionSchema.safeParse(req.body);
   if (!parsed.success) return next(new CustomError("Invalid input", 400));
 

@@ -74,6 +74,7 @@ async function register(req: Request, res: Response, next: NextFunction) {
         name: newUser.name,
         email: newUser.email,
         phone: newUser.phone,
+        address:newUser.address
       },
     });
   } catch (error) {
@@ -295,4 +296,18 @@ function logout(req: Request, res: Response) {
   });
 }
 
+
+export const checkAuth = async (req:Request,res:Response,next:NextFunction) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: "User Authenticate Successfully",
+      user: req.user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "Unauthorized access. Login required.",
+    });
+  }
+};
 export { register, login, SendOtp, verifyOtp ,logout,forgotPassword,resetPasswordViaOtp};

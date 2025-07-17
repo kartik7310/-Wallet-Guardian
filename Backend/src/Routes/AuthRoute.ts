@@ -6,6 +6,7 @@ import {
   verifyOtp,
   forgotPassword,
   resetPasswordViaOtp,
+  checkAuth,
   logout,
 } from "../Controllers/authController";
 
@@ -15,7 +16,7 @@ import {
   loginLimiter,
   passwordResetLimiter,
 } from "../utils/rateLimiter";
-
+import auth from "../Middleware/auth";
 import catchAsync from "../utils/catchAsync";
 
 const router = Router();
@@ -37,6 +38,7 @@ router.post("/forgot-password", passwordResetLimiter, catchAsync(forgotPassword)
 
 //  OTP verified password reset — allow but monitor
 router.post("/reset-password", passwordResetLimiter, catchAsync(resetPasswordViaOtp));
+router.get("/check",auth , checkAuth);
 
 
 // router.get("/logout", logout);
