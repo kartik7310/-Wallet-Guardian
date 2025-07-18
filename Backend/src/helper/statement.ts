@@ -3,8 +3,8 @@ import { browserPromise } from "../utils/puppeteer";
 import { generateBankStatementHTML } from "../utils/Tamplates/pdfFotmat";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage } from "@langchain/core/messages";
-import { Category } from "../../generated/prisma";
 import { aggregate } from "../helper/aggregation";
+import { Category } from "@prisma/client";
 
 function mdToHtml(md: string) {
   return md
@@ -34,7 +34,7 @@ export async function buildMonthlyStatementPdf(
   const budgets = await prisma.budget.findMany({ where: { userId } });
   const budgetMap: Record<string, { planned: number; spent: number }> = {};
   budgets.forEach(
-    (b) =>
+    (b:any) =>
       (budgetMap[b.category] = {
         planned: b.plannedAmount,
         spent: b.spentAmount,
@@ -86,7 +86,7 @@ Keep the tone concise and helpful.
   const aiSummary = mdToHtml([raw.content].join("\n\n").trim());
 
   /* build HTML → PDF */
-  const cleaned = txns.map((t) => ({
+  const cleaned = txns.map((t:any) => ({
     date: t.date,
     note: t.note ?? undefined,
     type: t.type,

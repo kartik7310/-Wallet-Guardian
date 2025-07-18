@@ -11,6 +11,7 @@ import VerifyOtp from "./Pages/VerifyOtp";
 import Dashboard from "./Pages/Dashboard";
 import Layout from "./layout/Layout";
 import { useAuthStore } from "./Store/useAuthStore";
+import About from "./Pages/About";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -44,18 +45,41 @@ const App = () => {
     <div className="flex flex-col items-center justify-start">
       <Toaster />
       <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="dashboard" element={authUser ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="budget" element={authUser ? <Budget /> : <Navigate to="/login" />} />
-        <Route path="transaction" element={authUser ? <Transaction /> : <Navigate to="/login" />} />
-      </Route>
 
-      <Route path="/login" element={!authUser ? <Login /> : <Navigate to="/" />} />
-      <Route path="/signup" element={!authUser ? <Signup /> : <Navigate to="/" />} />
-      <Route path="/verify" element={!authUser ? <VerifyOtp /> : <Navigate to="/" />} />
-    </Routes>
-
+        <Route path="/" element={<Layout />}>
+           <Route index element={<Home />} />
+          <Route
+            path="dashboard"
+            element ={<Dashboard/>}
+          />
+          <Route
+            path="budget"
+            element={authUser ? <Budget /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="transaction"
+            element={ <Transaction />}
+          />
+         
+        </Route>
+        
+        <Route
+          path="/login"
+          element={!authUser ? <Login /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/signup"
+          element={!authUser ? <Signup /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/verify"
+          element={!authUser ? <VerifyOtp /> : <Navigate to="/" />}
+        />
+      <Route
+            path="about"
+            element={ <About />}
+          />
+      </Routes>
     </div>
   );
 };

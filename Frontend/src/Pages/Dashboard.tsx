@@ -1,11 +1,14 @@
+import AppNavbar from "../Components/AppNavbar";
 
+AppNavbar
 
-const Dashborad = () => {
+const Dashboard = () => {
   return (
-    <div>
-      <h2>this is Dashborad</h2>
+    <div className="min-h-screen bg-gray-50">
+      <AppNavbar />
+      <main className="p-6">Welcome to your Dashboard!</main>
     </div>
-  )
-}
+  );
+};
 
-export default Dashborad
+export default Dashboard;

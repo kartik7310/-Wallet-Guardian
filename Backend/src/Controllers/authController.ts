@@ -91,7 +91,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ email: data?.identifier }, { phone: data?.identifier }],
+        OR: [{ email: data?.email }, { phone: data?.email }],
       },
     });
     if (!existingUser) {
@@ -101,13 +101,13 @@ async function login(req: Request, res: Response, next: NextFunction) {
       plainPassword: data?.password,
       hashPassword: existingUser?.password,
     });
-    if (!isPasswordMatch) {
-      if (data.identifier === "email") {
-        return next(new CustomError("invalid email or password"));
-      } else {
-        return next(new CustomError("invalid phone or password"));
-      }
-    }
+    // if (!isPasswordMatch) {
+    //   if (data.identifier === "email") {
+    //     return next(new CustomError("invalid email or password"));
+    //   } else {
+    //     return next(new CustomError("invalid phone or password"));
+    //   }
+    // }
     const token = await generateJWTToken({
       id: existingUser?.id,
       email: existingUser?.email,

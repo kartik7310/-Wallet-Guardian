@@ -20,10 +20,10 @@ import logger from "../utils/logger";
   const year  = dayjs(date).year();
 
   try {
-    const transaction = await prisma.$transaction(async (tx) => {
+    const transaction = await prisma.$transaction(async (tx:any) => {
       let budget;                          // budget may be undefined for income
 
-      // 2️⃣ Expense‑only: fetch + validate budget
+      // 2️ Expense‑only: fetch + validate budget
       if (type === "expense") {
         budget = await tx.budget.findUnique({
           where: {
@@ -111,7 +111,7 @@ async function UpdateTransaction(req: Request, res: Response, next: NextFunction
   if (!userId) return next(new CustomError("Unauthorized", 401));
 
   try {
-    const updatedTransaction = await prisma.$transaction(async (tx) => {
+    const updatedTransaction = await prisma.$transaction(async (tx:any) => {
       // 1️ Fetch existing transaction
       const existing = await tx.transaction.findUnique({
         where: { id: Number(transactionId), deleted: false },
@@ -214,7 +214,7 @@ async function DeleteTransaction(req: Request, res: Response, next: NextFunction
   if (!userId) return next(new CustomError("Unauthorized", 401));
 
   try {
-    const updatedTransaction = await prisma.$transaction(async (tx) => {
+    const updatedTransaction = await prisma.$transaction(async (tx:any) => {
       // 1️ Fetch transaction
       const transaction = await tx.transaction.findUnique({
         where: { id: Number(transactionId),deleted:false },

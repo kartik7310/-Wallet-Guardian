@@ -2,6 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+
 interface Signup {
   name: string;
   email: string;
@@ -12,27 +13,32 @@ interface Signup {
 }
 
 interface Auth {
+  
   authUser: any | null;
   isLoggingIn: boolean;
   isCheckingAuth: boolean;
   isVerified: boolean;
   isVerifying: boolean;
-
+   isLoggedIn:boolean
   checkAuth: () => Promise<void>;
   sendOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, otp: string) => Promise<boolean>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (payload: { email: string; password: string }) => Promise<void>;
   signup: (userData: Signup) => Promise<void>;
 }
 
 export const useAuthStore = create<Auth>((set) => ({
+
   authUser: null,
   isLoggingIn: false,
   isCheckingAuth: false,
   isVerifying: false,
   isVerified: false,
+isLoggedIn:false,
+
 
   checkAuth: async () => {
+   
     set({ isCheckingAuth: true });
     try {
       const res = await axios.get("http://localhost:8080/api/v1/auth/check", {
@@ -71,23 +77,25 @@ export const useAuthStore = create<Auth>((set) => ({
     }
   },
 
-  login: async (email, password) => {
-    set({ isLoggingIn: true });
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/api/v1/auth/login",
-        { email, password },
-        { withCredentials: true }
-      );
-      toast.success(res.data?.message || "Login successful");
-      set({ authUser: res.data.user });
-    
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Login failed");
-    } finally {
-      set({ isLoggingIn: false });
-    }
-  },
+  login: async  ({ email, password })=> {
+
+  set({ isLoggingIn: true });
+  try {
+    const res = await axios.post(
+      "http://localhost:8080/api/v1/auth/login", // Fix typo here too
+      { email, password },
+      { withCredentials: true }
+    );
+    toast.success(res.data?.message || "Login successful");
+    set({ authUser: res.data.user });
+    set({isLoggedIn:true})
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || "Login failed");
+  } finally {
+    set({ isLoggingIn: false });
+  }
+},
+
 
   signup: async (userData: Signup) => {
     set({ isLoggingIn: true });

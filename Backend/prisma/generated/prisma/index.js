@@ -211,7 +211,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\karti\\Desktop\\ExpenseTracker\\Backend\\generated\\prisma",
+      "value": "C:\\Users\\karti\\Desktop\\ExpenseTracker\\Backend\\prisma\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -230,15 +230,16 @@ const config = {
   },
   "relativeEnvPaths": {
     "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "schemaEnvPath": "../../../.env"
   },
-  "relativePath": "../../prisma",
+  "relativePath": "../..",
   "clientVersion": "6.11.1",
   "engineVersion": "f40f79ec31188888a2e33acda0ecc8fd10a853a9",
   "datasourceNames": [
     "db"
   ],
   "activeProvider": "mysql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -247,8 +248,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id             Int           @id @default(autoincrement())\n  name           String\n  email          String        @unique\n  password       String\n  phone          String        @unique\n  address        String\n  profilePicture String?\n  createdAt      DateTime      @default(now())\n  updatedAt      DateTime      @updatedAt\n  transactions   Transaction[]\n  budgets        Budget[]\n}\n\nmodel Transaction {\n  id        Int             @id @default(autoincrement())\n  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)\n  userId    Int\n  category  Category\n  type      TransactionType\n  amount    Float\n  date      DateTime\n  note      String?\n  deleted   Boolean         @default(false)\n  createdAt DateTime        @default(now())\n  updatedAt DateTime        @updatedAt\n}\n\nmodel Budget {\n  id     Int  @id @default(autoincrement())\n  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)\n  userId Int\n\n  category          Category\n  plannedAmount     Float\n  spentAmount       Float    @default(0)\n  lastNotifiedLevel Int?\n  month             Int\n  year              Int\n  notes             String?\n  notified          Boolean  @default(false)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@unique([userId, category, month, year])\n}\n\nenum TransactionType {\n  income\n  expense\n}\n\nenum Category {\n  Food\n  Rent\n  Salary\n  Transport\n  Shopping\n  Investment\n  Other\n}\n\nmodel OTP {\n  id         Int       @id @default(autoincrement())\n  identifier String // email or phone\n  token      String // 6-digit OTP\n  method     OtpMethod // \"email\" or \"phone\"\n  expiresAt  DateTime\n  verified   Boolean   @default(false)\n  createdAt  DateTime  @default(now())\n}\n\nenum OtpMethod {\n  email\n  phone\n}\n",
-  "inlineSchemaHash": "2fe1cf9d4008e6338a83dec3f3c4b800700e0704b73ae39d7f608ed1da56ee11",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id             Int           @id @default(autoincrement())\n  name           String\n  email          String        @unique\n  password       String\n  phone          String        @unique\n  address        String\n  profilePicture String?\n  createdAt      DateTime      @default(now())\n  updatedAt      DateTime      @updatedAt\n  transactions   Transaction[]\n  budgets        Budget[]\n}\n\nmodel Transaction {\n  id        Int             @id @default(autoincrement())\n  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)\n  userId    Int\n  category  Category\n  type      TransactionType\n  amount    Float\n  date      DateTime\n  note      String?\n  deleted   Boolean         @default(false)\n  createdAt DateTime        @default(now())\n  updatedAt DateTime        @updatedAt\n}\n\nmodel Budget {\n  id     Int  @id @default(autoincrement())\n  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)\n  userId Int\n\n  category          Category\n  plannedAmount     Float\n  spentAmount       Float    @default(0)\n  lastNotifiedLevel Int?\n  month             Int\n  year              Int\n  notes             String?\n  notified          Boolean  @default(false)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@unique([userId, category, month, year])\n}\n\nenum TransactionType {\n  income\n  expense\n}\n\nenum Category {\n  Food\n  Rent\n  Salary\n  Transport\n  Shopping\n  Investment\n  Other\n}\n\nmodel OTP {\n  id         Int       @id @default(autoincrement())\n  identifier String // email or phone\n  token      String // 6-digit OTP\n  method     OtpMethod // \"email\" or \"phone\"\n  expiresAt  DateTime\n  verified   Boolean   @default(false)\n  createdAt  DateTime  @default(now())\n}\n\nenum OtpMethod {\n  email\n  phone\n}\n",
+  "inlineSchemaHash": "a336995d7d9d4ef383f75ffc891f6a314ac14605dfff1e2103ed5bc2cf42fb3b",
   "copyEngine": true
 }
 
@@ -257,8 +258,8 @@ const fs = require('fs')
 config.dirname = __dirname
 if (!fs.existsSync(path.join(__dirname, 'schema.prisma'))) {
   const alternativePaths = [
+    "prisma/generated/prisma",
     "generated/prisma",
-    "prisma",
   ]
   
   const alternativePath = alternativePaths.find((altPath) => {
@@ -288,7 +289,7 @@ Object.assign(exports, Prisma)
 
 // file annotations for bundling tools to include these files
 path.join(__dirname, "query_engine-windows.dll.node");
-path.join(process.cwd(), "generated/prisma/query_engine-windows.dll.node")
+path.join(process.cwd(), "prisma/generated/prisma/query_engine-windows.dll.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
-path.join(process.cwd(), "generated/prisma/schema.prisma")
+path.join(process.cwd(), "prisma/generated/prisma/schema.prisma")
