@@ -36,7 +36,6 @@ async function auth(req: Request, res: Response, next: NextFunction): Promise<vo
     if (!user || !user.id) {
       return next(new CustomError("Unauthorized", 401));
     }
-    console.log("auth middleware user:", user);
     
     req.user = user;
     next();

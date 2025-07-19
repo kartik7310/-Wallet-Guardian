@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:123456@host.docker.internal:3307/EXPENSE_TRACKER"
+  url      = "mysql://root:123456@host.docker.internal:3306/EXPENSE_TRACKER"
 }
 
 model User {

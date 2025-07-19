@@ -6,7 +6,9 @@ COPY package*.json ./
 COPY prisma ./prisma/
 COPY tsconfig.json ./
 # Install dependencies and generate Prisma client
+
 RUN npm install && npx prisma generate
+RUN npx prisma migrate
 # Copy the rest of the source and build
 COPY ./src ./src
 RUN npm run build
@@ -25,8 +27,8 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
 
 ENV NODE_ENV=production
-EXPOSE 3000
+EXPOSE 8080
 # Optional health check (adjust  app's health endpoint)
 HEALTHCHECK --interval=30s --timeout=3s CMD node dist/healthcheck.js 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+CMD ["npm", "start"]
 
