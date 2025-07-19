@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+dotenv.config();
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -18,8 +19,10 @@ import "./jobs/cleanExpiredOtps";
 import "./jobs/resetBudget";
 startTransactionStatementJob();
 const app = express();
-dotenv.config();
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT;
+console.log("port is here",PORT);
+
 
 
 app.use(express.json());
@@ -30,7 +33,7 @@ app.use(morgan("dev"));
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin:"http://loaclhost:3000",
     methods: ["GET,PUT,POST,DELETE"],
     credentials: true,
   })
@@ -64,6 +67,7 @@ async function startServer() {
     );
   } catch (err) {
     logger.error("🔴 Failed to start server:", err);
+       console.error(err); // <-- Add this to show full error
     process.exit(1);
   }
 }
@@ -74,4 +78,12 @@ process.on("SIGINT", async () => {
   await prisma.$disconnect();
   logger.info("🛑 Prisma disconnected");
   process.exit(0);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
 });
